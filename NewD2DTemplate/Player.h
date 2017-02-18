@@ -7,6 +7,12 @@
 #include "keyboard.h"
 class Player 
 {
+	struct Direction
+	{
+		bool left = false;
+		bool right = true;
+		bool jumping = false;
+	};
 public:
 	struct RenderDesc
 	{
@@ -42,7 +48,7 @@ protected:
 	int m_indicesIndex = 1;
 	int m_incIndex = 2;
 	float timer = 0.0f;
-	float timerInc = 0.25f;
+	float timerInc = 0.15f;
 	bool isMoving = false;
 	D2D1_SIZE_F m_dimensions;
 	D2D1_RECT_F m_clipRect;
@@ -50,6 +56,7 @@ protected:
 	b2Body* m_body = nullptr;
 	b2Fixture* m_fixture = nullptr;
 	ID2D1Bitmap* m_image = nullptr;
+	Direction m_Dir;
 public:
 	Player(b2World* world, Vec2f pos, D2D1_SIZE_F& dim);
 	void Update(float dt,Keyboard& kbd);

@@ -23,22 +23,26 @@ Player::Player(b2World * world, Vec2f pos, D2D1_SIZE_F& dim)
 	fix.friction = 8.0f;
 	
 	m_fixture = m_body->CreateFixture(&fix);
-	m_body->SetGravityScale(2.0f);
+	m_body->SetGravityScale(5.0f);
 }
 
 void Player::Update(float dt, Keyboard& kbd)
 {
-	if (kbd.KeyIsPressed(VK_RIGHT))
+	if (kbd.KeyIsPressed(VK_RIGHT)&& !m_Dir.jumping)
 	{
 		m_indicesIndex = 1;
 		isMoving = true;
+		m_Dir.right = true;
+		m_Dir.left = false;
 		//m_body->ApplyLinearImpulseToCenter(b2Vec2(10.0f, 0.0f), true);
 		m_body->ApplyForceToCenter(b2Vec2(1000000.0f, 0.0f), true);
 	}
-	else if (kbd.KeyIsPressed(VK_LEFT))
+	else if (kbd.KeyIsPressed(VK_LEFT) && !m_Dir.jumping)
 	{
 		m_indicesIndex = 0;
 		isMoving = true;
+		m_Dir.right = false;
+		m_Dir.left = true;
 		m_body->ApplyForceToCenter(b2Vec2(-1000000.0f, 0.0f), true);
 	}
 	else
@@ -62,7 +66,69 @@ void Player::Update(float dt, Keyboard& kbd)
 	{
 		timer = 0.0f;
 	}
-	
+	if (m_body->GetLinearVelocity().y > 0.0f && !isMoving)
+	{
+		if (m_Dir.left)
+		{
+			m_indicesIndex = 3;
+			m_incIndex = 1;
+		}
+		if (m_Dir.right)
+		{
+			m_indicesIndex = 2;
+			m_incIndex = 3;
+		}
+		m_Dir.jumping = true;
+	}
+	for (b2ContactEdge* ce = m_body->GetContactList(); ce != nullptr; ce = ce->next)
+	{
+		b2Contact* contact = ce->contact;
+		if (contact->IsTouching())
+		{
+			b2WorldManifold man;
+			contact->GetWorldManifold(&man);
+			bool below = false;
+			for (int i = 0; i < b2_maxManifoldPoints; i++)
+			{
+				if (man.points[i].y > m_body->GetPosition().y + m_dimensions.height / 2.0f)
+				{
+					
+					if (m_Dir.left && m_Dir.jumping)
+					{
+						m_indicesIndex = 0;
+						m_incIndex = 1;
+					}
+					if (m_Dir.right&& m_Dir.jumping)
+					{
+						m_indicesIndex = 1;
+						m_incIndex = 2;
+					}
+					m_Dir.jumping = false;
+					below = true;
+					break;
+				}
+			}
+			if (below)
+			{
+				if (kbd.KeyIsPressed(VK_UP))
+				{
+					if (m_Dir.left)
+					{
+						m_indicesIndex = 3;
+						m_incIndex = 1;
+					}
+					if (m_Dir.right)
+					{
+						m_indicesIndex = 2;
+						m_incIndex = 3;
+					}
+					m_Dir.jumping = true;
+					isMoving = false;
+					m_body->ApplyLinearImpulse(b2Vec2(0.0f, -50000.0f), b2Vec2(0.0f, 0.0f), true);
+				}
+			}
+		}
+	}
 	TextureManager::ImageClip clip;
 	clip = Locator::ImageManager->GetClip("dude", m_indexes[m_indicesIndex][m_incIndex]);
 	m_image = clip.bitmap;

@@ -16,7 +16,7 @@ Game::Game(Direct3DWindow & wnd)
 	m_cam.ConfineToMap(RectF(0.0f, 0.0f,3000.0f, (float)wnd.ScreenHeight()));
 	LoadImages();
 	LoadWorld();
-	m_player = std::make_unique<Player>(m_world.get(), Vec2f(200.0f, 200.0f), D2D1::SizeF(20.0f, 64.0f));
+	m_player = std::make_unique<Player>(m_world.get(), Vec2f(200.0f, 436.0f), D2D1::SizeF(20.0f, 64.0f));
 }
 
 bool Game::Play(const float& deltaTime)
@@ -40,6 +40,7 @@ HRESULT Game::ConstructScene(const float& deltaTime)
 
 	Vec2f pos(m_player->GetPosition().x, m_player->GetPosition().y);
 	m_cam.UpdatePosition(pos);
+	numCreatedSprite.UpdateText(std::to_wstring(m_player->GetPosition().y));
 	return S_OK;
 }
 
@@ -92,7 +93,7 @@ void Game::LoadWorld()
 	clip = m_textures->GetClip("level1", 5);
 	for (int c = 0; c < 30; c++)
 	{
-		m_Boxes.emplace_back(m_world.get(), Vec2f(randG.Get<float>(10.0f, 1000.0f), randG.Get<float>(10.0f, 200.0f)), 
+		m_Boxes.emplace_back(m_world.get(), Vec2f(randG.Get<float>(10.0f, 500.0f), randG.Get<float>(630.0f, 635.0f)), 
 			clip.bitmap, D2D1::SizeF(32.0f,32.0f),clip.rect.ToD2D(),1.0f);
 		y += 8.0f;
 		x += 10.0f;
