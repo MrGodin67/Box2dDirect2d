@@ -28,6 +28,8 @@ class Game
 	void LoadImages();
 	void LoadWorld();
 	void HandleInput();
+	void LoadAudio();
+	void LoadLevel();
 	
 private:
 	_GameState m_gameState = _GameState::paused;
@@ -55,5 +57,6 @@ public:
 
 private:
 	
-	void LoadAudio();
+	class_scope constexpr float tileSize = 64.0f;
+	class_scope constexpr float tileOffset = 64.0f * 0.5f;
 };

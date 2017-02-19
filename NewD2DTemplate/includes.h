@@ -26,8 +26,9 @@
 // user defined
 
 #include "errors.h"
-#ifndef class_static
-#define class_static static
+
+#ifndef class_scope
+#define class_scope static
 #endif
 #ifndef local_persist
 #define local_persist static

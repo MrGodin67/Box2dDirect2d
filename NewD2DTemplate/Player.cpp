@@ -19,7 +19,7 @@ Player::Player(b2World * world, Vec2f pos, D2D1_SIZE_F& dim)
 	shape.SetAsBox(m_dimensions.width / 2, m_dimensions.height / 2);
 	b2FixtureDef fix;
 	fix.shape = &shape;
-	fix.density = 1.01f;
+	fix.density = 0.01f;
 	fix.friction = 8.0f;
 	
 	m_fixture = m_body->CreateFixture(&fix);
@@ -28,16 +28,20 @@ Player::Player(b2World * world, Vec2f pos, D2D1_SIZE_F& dim)
 
 void Player::Update(float dt, Keyboard& kbd)
 {
-	if (kbd.KeyIsPressed(VK_RIGHT)&& !m_Dir.jumping)
+	
+	
+	
+	
+	if (kbd.KeyIsPressed(VK_RIGHT))
 	{
 		m_indicesIndex = 1;
 		isMoving = true;
 		m_Dir.right = true;
 		m_Dir.left = false;
-		//m_body->ApplyLinearImpulseToCenter(b2Vec2(10.0f, 0.0f), true);
+		
 		m_body->ApplyForceToCenter(b2Vec2(1000000.0f, 0.0f), true);
 	}
-	else if (kbd.KeyIsPressed(VK_LEFT) && !m_Dir.jumping)
+	else if (kbd.KeyIsPressed(VK_LEFT) )
 	{
 		m_indicesIndex = 0;
 		isMoving = true;
@@ -123,7 +127,7 @@ void Player::Update(float dt, Keyboard& kbd)
 						m_incIndex = 3;
 					}
 					m_Dir.jumping = true;
-					isMoving = false;
+					
 					m_body->ApplyLinearImpulse(b2Vec2(0.0f, -50000.0f), b2Vec2(0.0f, 0.0f), true);
 				}
 			}

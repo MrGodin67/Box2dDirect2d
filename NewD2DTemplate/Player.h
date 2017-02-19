@@ -12,6 +12,7 @@ class Player
 		bool left = false;
 		bool right = true;
 		bool jumping = false;
+		bool moving = false;
 	};
 public:
 	struct RenderDesc
@@ -63,4 +64,15 @@ public:
 	Drawable GetDrawable();
 	b2Vec2 GetPosition();
 	
+};
+
+union dim {
+	struct {
+		float x, y;
+	};
+	struct
+	{
+		float width, height;
+	};
+	float E[2];
 };

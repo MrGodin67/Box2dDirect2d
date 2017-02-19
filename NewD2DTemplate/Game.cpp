@@ -16,7 +16,8 @@ Game::Game(Direct3DWindow & wnd)
 	m_cam.ConfineToMap(RectF(0.0f, 0.0f,3000.0f, (float)wnd.ScreenHeight()));
 	LoadImages();
 	LoadWorld();
-	m_player = std::make_unique<Player>(m_world.get(), Vec2f(200.0f, 436.0f), D2D1::SizeF(20.0f, 64.0f));
+	m_player = std::make_unique<Player>(m_world.get(), Vec2f(200.0f, 436.0f), D2D1::SizeF(20.0f, 60.0f));
+
 }
 
 bool Game::Play(const float& deltaTime)
@@ -87,7 +88,7 @@ void Game::LoadWorld()
 	m_world->SetAllowSleeping(true);
 	float y = 50.0f;
 	float x = 100.0f;
-	
+	LoadLevel();
 	RandomGenerator<std::mt19937> randG;
 	TextureManager::ImageClip clip;
 	clip = m_textures->GetClip("level1", 5);
@@ -95,33 +96,9 @@ void Game::LoadWorld()
 	{
 		m_Boxes.emplace_back(m_world.get(), Vec2f(randG.Get<float>(10.0f, 500.0f), randG.Get<float>(630.0f, 635.0f)), 
 			clip.bitmap, D2D1::SizeF(32.0f,32.0f),clip.rect.ToD2D(),1.0f);
-		y += 8.0f;
-		x += 10.0f;
 		numItemsCreated++;
 	}
-	clip = m_textures->GetClip("level1", 1);
-	x = 0.0f;
-	for (int i = 0; i < 32; i++)
-	{
-		m_Static.emplace_back(m_world.get(), Vec2f(x, 700.0f), clip.bitmap, D2D1::SizeF(64.0f, 64.0f), clip.rect.ToD2D(), 1.0f);
-		x += 64.0f;
-		numItemsCreated++;
-	}
-	x = 128.0f;
-	for (int i = 0; i < 4; i++)
-	{
-		m_Static.emplace_back(m_world.get(), Vec2f(x, 500.0f), clip.bitmap, D2D1::SizeF(64.0f, 64.0f), clip.rect.ToD2D(), 1.0f);
-		x += 64.0f;
-		numItemsCreated++;
-	}
-
-	x = 632.0f;
-	for (int i = 0; i < 4; i++)
-	{
-		m_Static.emplace_back(m_world.get(), Vec2f(x, 400.0f), clip.bitmap, D2D1::SizeF(64.0f, 64.0f), clip.rect.ToD2D(), 1.0f);
-		x += 64.0f;
-		numItemsCreated++;
-	}
+	
 	numCreatedSprite.UpdateText(std::to_wstring(numItemsCreated));
 }
 
@@ -142,6 +119,55 @@ void Game::LoadAudio()
 {
 	m_soundFX = std::make_unique<SoundManager>();
 	Locator::SetSoundManager(m_soundFX.get());
+}
+
+void Game::LoadLevel()
+{
+	std::vector<std::string> map = Utils::LoadTextFile("maps\\test001.txt");
+	assert(map.size() > 0);
+	std::vector<std::string> tokens;
+	std::string data = map[0];
+	// get data about map
+	Utils::Tokenize(&tokens, data, " ");
+	int rows = atoi(tokens[0].c_str());
+	int columns = atoi(tokens[1].c_str());
+	// remove data
+	map.erase(map.begin());
+	m_cam.ConfineToMap(RectF(0.0f, 0.0f, (float)columns*tileSize, (float)rows*tileSize));
+	Vec2f pos = { tileOffset,tileOffset };
+	
+	for (size_t r = 0; r < rows; r++)
+	{
+		pos.x = tileOffset;
+		for (size_t c = 0; c < columns; c++)
+		{
+			switch (map[r][c])
+			{
+			case '0':
+			{
+				TextureManager::ImageClip clip;
+				clip = m_textures->GetClip("level1", 3);
+				m_Static.emplace_back(m_world.get(), pos, clip.bitmap, D2D1::SizeF(tileSize, tileSize), clip.rect.ToD2D(), 1.0f);
+				numItemsCreated++;
+			}
+			break;
+			case '1':
+			{
+				TextureManager::ImageClip clip;
+				clip = m_textures->GetClip("level1", 1);
+				m_Static.emplace_back(m_world.get(), pos, clip.bitmap, D2D1::SizeF(tileSize, tileSize), clip.rect.ToD2D(), 1.0f);
+				numItemsCreated++;
+			}
+			break;
+			default:
+				break;
+			};
+			pos.x += tileSize;
+		}
+		pos.y += tileSize;
+	}
+
+
 }
 
 
